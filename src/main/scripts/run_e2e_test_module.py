@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     module_to_build : str = sys.argv[1]
     print(f"Building plugin {module_to_build}")
-    run_shell_command(f"mvn clean package -pl {module_to_build} -am -DskipTests")
+    run_shell_command(f"mvn clean package -pl {module_to_build} -am -DskipTests -P e2e-tests")
     # Get plugin artifact name and version from pom.xml.
     os.chdir(f"{module_to_build}")
     root = ET.parse('pom.xml').getroot()
@@ -76,9 +76,9 @@ if __name__ == "__main__":
     run_shell_command("mvn clean install")
     print("Running e2e integration tests")
     assertion_error = None
-    os.chdir(f"../plugin/{module_to_build}")
+    os.chdir(f"../plugin")
     try:
-        run_shell_command("mvn clean install -P e2e-tests")
+        run_shell_command(f"mvn install -DtestSourceDirectory={module_to_build}/src/e2e-test/java -pl {module_to_build} -amd -P e2e-tests")
     except AssertionError as e:
         assertion_error = e
     finally:
